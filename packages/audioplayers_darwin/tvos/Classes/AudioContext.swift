@@ -81,7 +81,22 @@ struct AudioContext {
             return .mixWithOthers
         case "duckOthers":
             return .duckOthers
-        #if !os(tvOS) // Exclude these options for tvOS as they might not be supported or behave differently
+        #if os(tvOS)
+        case "allowBluetooth":
+            if #available(tvOS 17.0, *) {
+                return .allowBluetooth
+            } else {
+                throw AudioPlayerError.warning(
+                    "Category Option allowBluetooth is only available on tvOS 17+")
+            }
+        case "allowBluetoothA2DP":
+            if #available(tvOS 17.0, *) {
+                return .allowBluetoothA2DP
+            } else {
+                throw AudioPlayerError.warning(
+                    "Category Option allowBluetoothA2DP is only available on tvOS 17+")
+            }
+        #else
         case "allowBluetooth":
             return .allowBluetooth
         case "allowBluetoothA2DP":
@@ -99,7 +114,11 @@ struct AudioContext {
             }
         #endif
         case "defaultToSpeaker":
+            #if !os(tvOS)
             return .defaultToSpeaker
+            #else
+            throw AudioPlayerError.warning("Category Option defaultToSpeaker is unavailable on tvOS")
+            #endif
         case "interruptSpokenAudioAndMixWithOthers":
             return .interruptSpokenAudioAndMixWithOthers
         case "overrideMutedMicrophoneInterruption":
