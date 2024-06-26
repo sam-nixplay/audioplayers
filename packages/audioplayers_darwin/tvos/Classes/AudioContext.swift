@@ -122,12 +122,16 @@ struct AudioContext {
         case "interruptSpokenAudioAndMixWithOthers":
             return .interruptSpokenAudioAndMixWithOthers
         case "overrideMutedMicrophoneInterruption":
+            #if !os(tvOS)
             if #available(iOS 14.5, *) {
                 return .overrideMutedMicrophoneInterruption
             } else {
                 throw AudioPlayerError.warning(
                     "Category Option overrideMutedMicrophoneInterruption is only available on iOS 14.5+")
             }
+            #else
+            throw AudioPlayerError.warning("Category Option overrideMutedMicrophoneInterruption is unavailable on tvOS")
+            #endif
         default:
             throw AudioPlayerError.error("Invalid Category Option \(option)")
         }
