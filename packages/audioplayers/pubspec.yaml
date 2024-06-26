@@ -11,6 +11,8 @@ flutter:
         default_package: audioplayers_android
       ios:
         default_package: audioplayers_darwin
+      tvos:
+        default_package: audioplayers_darwin  
       linux:
         default_package: audioplayers_linux
       macos:
