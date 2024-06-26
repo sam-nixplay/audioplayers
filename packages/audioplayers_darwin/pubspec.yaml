@@ -12,6 +12,8 @@ flutter:
         pluginClass: AudioplayersDarwinPlugin
       macos:
         pluginClass: AudioplayersDarwinPlugin
+      tvos:   # Add this block for tvOS support
+        pluginClass: AudioplayersDarwinPlugin
 
 dependencies:
   audioplayers_platform_interface: ^7.0.0
@@ -26,4 +28,5 @@ dev_dependencies:
 environment:
   sdk: '>=3.0.0 <4.0.0'
   flutter: '>=3.13.0'
+
 
