@@ -1,17 +1,16 @@
 import AVFoundation
 import AVKit
 
-#if os(iOS)
-  import Flutter
-  import UIKit
-  import MediaPlayer
+#if os(iOS) || os(tvOS)
+import Flutter
+import UIKit
+import MediaPlayer
 #else
-  import FlutterMacOS
-  import AVFAudio
+import FlutterMacOS
+import AVFAudio
 #endif
 
 let channelName = "xyz.luan/audioplayers"
-
 let globalChannelName = "xyz.luan/audioplayers.global"
 
 public class SwiftAudioplayersDarwinPlugin: NSObject, FlutterPlugin {
@@ -52,10 +51,10 @@ public class SwiftAudioplayersDarwinPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
     // apparently there is a bug in Flutter causing some inconsistency between Flutter and FlutterMacOS
     // See: https://github.com/flutter/flutter/issues/118103
-    #if os(iOS)
-      let binaryMessenger = registrar.messenger()
+    #if os(iOS) || os(tvOS)
+    let binaryMessenger = registrar.messenger()
     #else
-      let binaryMessenger = registrar.messenger
+    let binaryMessenger = registrar.messenger
     #endif
 
     let methods = FlutterMethodChannel(name: channelName, binaryMessenger: binaryMessenger)

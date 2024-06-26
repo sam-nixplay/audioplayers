@@ -1,13 +1,10 @@
 import AVKit
 
 private let defaultPlaybackRate: Double = 1.0
-
 private let defaultVolume: Double = 1.0
-
 private let defaultLooping: Bool = false
 
 typealias Completer = () -> Void
-
 typealias CompleterError = (Error?) -> Void
 
 class WrappedMediaPlayer {
@@ -100,7 +97,7 @@ class WrappedMediaPlayer {
   func resume() {
     isPlaying = true
     configParameters(player: player)
-    if #available(iOS 10.0, macOS 10.12, *) {
+    if #available(iOS 10.0, tvOS 10.0, *) {
       player.playImmediately(atRate: Float(playbackRate))
     } else {
       player.play()
@@ -180,7 +177,7 @@ class WrappedMediaPlayer {
     let playerItem: AVPlayerItem
 
     if let unwrappedMimeType = mimeType {
-      if #available(iOS 17, macOS 14.0, *) {
+      if #available(iOS 17, tvOS 17, macOS 14.0, *) {
         let asset = AVURLAsset(
           url: parsedUrl, options: [AVURLAssetOverrideMIMETypeKey: unwrappedMimeType])
         playerItem = AVPlayerItem(asset: asset)

@@ -14,7 +14,7 @@
   <a title="Melos" href="https://github.com/invertase/melos"><img src="https://img.shields.io/badge/maintained%20with-melos-f700ff.svg"/></a>
 </p>
 
-The iOS and macOS (Darwin) implementation of [`audioplayers`](https://pub.dev/packages/audioplayers).
+The iOS, macOS and tvOS (Darwin) implementation of [`audioplayers`](https://pub.dev/packages/audioplayers).
 
 ## Usage
 
