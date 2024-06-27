@@ -123,8 +123,7 @@ class WrappedMediaPlayer {
       completer?()
       return
     }
-    currentItem.seek(to: time) {
-      finished in
+    currentItem.seek(to: time) { finished in
       if !self.isPlaying {
         self.player.pause()
       }

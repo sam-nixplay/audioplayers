@@ -12,7 +12,7 @@ flutter:
         pluginClass: AudioplayersDarwinPlugin
       macos:
         pluginClass: AudioplayersDarwinPlugin
-      tvos:   # Add this block for tvOS support
+      tvos:
         pluginClass: AudioplayersDarwinPlugin
 
 dependencies:
