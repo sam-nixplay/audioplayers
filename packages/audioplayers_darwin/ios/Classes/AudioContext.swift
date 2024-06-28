@@ -1,8 +1,9 @@
+import AVFoundation
 import MediaPlayer
 
 struct AudioContext {
     let category: AVAudioSession.Category
-    let options: [AVAudioSession.CategoryOptions]
+    let options: AVAudioSession.CategoryOptions
 
     init() {
         self.category = .playback
@@ -14,22 +15,23 @@ struct AudioContext {
         options: [AVAudioSession.CategoryOptions]
     ) {
         self.category = category
-        self.options = options
+        self.options = options.reduce(AVAudioSession.CategoryOptions()) { $0.union($1) }
     }
 
     func activateAudioSession(
         active: Bool
     ) throws {
         let session = AVAudioSession.sharedInstance()
+        print("Activating audio session: \(active)")
         try session.setActive(active)
+        print("Audio session activated: \(active)")
     }
 
     func apply() throws {
         let session = AVAudioSession.sharedInstance()
-        let combinedOptions = options.reduce(AVAudioSession.CategoryOptions()) {
-            [$0, $1]
-        }
-        try session.setCategory(category, options: combinedOptions)
+        print("Applying audio session category: \(category) with options: \(options)")
+        try session.setCategory(category, options: options)
+        print("Audio session category applied: \(category)")
     }
 
     static func parse(args: [String: Any]) throws -> AudioContext? {

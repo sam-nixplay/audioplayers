@@ -1,3 +1,4 @@
+import AVFoundation
 import MediaPlayer
 
 struct AudioContext {
@@ -21,12 +22,16 @@ struct AudioContext {
         active: Bool
     ) throws {
         let session = AVAudioSession.sharedInstance()
+        print("Activating audio session: \(active)")
         try session.setActive(active)
+        print("Audio session activated: \(active)")
     }
 
     func apply() throws {
         let session = AVAudioSession.sharedInstance()
+        print("Applying audio session category: \(category) with options: \(options)")
         try session.setCategory(category, options: options)
+        print("Audio session category applied: \(category)")
     }
 
     static func parse(args: [String: Any]) throws -> AudioContext? {
