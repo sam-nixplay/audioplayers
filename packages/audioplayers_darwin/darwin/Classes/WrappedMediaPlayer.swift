@@ -44,38 +44,44 @@ class WrappedMediaPlayer {
   }
 
   func setSourceUrl(
-    url: String,
-    isLocal: Bool,
-    mimeType: String? = nil,
-    completer: Completer? = nil,
-    completerError: CompleterError? = nil
+      url: String,
+      isLocal: Bool,
+      mimeType: String? = nil,
+      completer: Completer? = nil,
+      completerError: CompleterError? = nil
   ) {
-    let playbackStatus = player.currentItem?.status
+      let playbackStatus = player.currentItem?.status
 
-    activateAudioSession()  // Ensure audio session is activated
+      activateAudioSession()  // Ensure audio session is activated
+      print("Current playback status: \(String(describing: playbackStatus))")
 
-    if self.url != url || playbackStatus == .failed || playbackStatus == nil {
-      reset()
-      self.url = url
-      do {
-        let playerItem = try createPlayerItem(url: url, isLocal: isLocal, mimeType: mimeType)
-        // Need to observe item status immediately after creating:
-        setUpPlayerItemStatusObservation(
-          playerItem,
-          completer: completer,
-          completerError: completerError)
-        // Replacing the player item triggers completion in setUpPlayerItemStatusObservation
-        self.player.replaceCurrentItem(with: playerItem)
-        self.setUpSoundCompletedObserver(self.player, playerItem)
-      } catch {
-        completerError?(error)
+      if self.url != url || playbackStatus == .failed || playbackStatus == nil {
+          print("Resetting player and setting new source URL: \(url)")
+          reset()
+          self.url = url
+          do {
+              let playerItem = try createPlayerItem(url: url, isLocal: isLocal, mimeType: mimeType)
+              // Need to observe item status immediately after creating:
+              setUpPlayerItemStatusObservation(
+                  playerItem,
+                  completer: completer,
+                  completerError: completerError)
+              // Replacing the player item triggers completion in setUpPlayerItemStatusObservation
+              self.player.replaceCurrentItem(with: playerItem)
+              self.setUpSoundCompletedObserver(self.player, playerItem)
+              print("Player item set and ready to play.")
+          } catch {
+              print("Error creating player item: \(error.localizedDescription)")
+              completerError?(error)
+          }
+      } else {
+          if playbackStatus == .readyToPlay {
+              print("Player item is already ready to play.")
+              completer?()
+          }
       }
-    } else {
-      if playbackStatus == .readyToPlay {
-        completer?()
-      }
-    }
   }
+
 
   private func activateAudioSession() {
     let session = AVAudioSession.sharedInstance()
@@ -208,24 +214,28 @@ class WrappedMediaPlayer {
 
   private func setUpPlayerItemStatusObservation(
     _ playerItem: AVPlayerItem,
-    completer: Completer? = nil,
-    completerError: CompleterError? = nil
+    completer: Completer?,
+    completerError: CompleterError?
   ) {
-    playerItemStatusObservation = playerItem.observe(\AVPlayerItem.status) { (playerItem, change) in
-      let status = playerItem.status
-      self.eventHandler.onLog(message: "player status: \(status), change: \(change)")
-
-      switch playerItem.status {
-      case .readyToPlay:
-        self.updateDuration()
-        completer?()
-      case .failed:
-        self.reset()
-        completerError?(nil)
-      default:
-        break
+      playerItem.observe(\.status, options: [.new, .initial]) { item, change in
+          switch item.status {
+          case .readyToPlay:
+              print("Player item is ready to play.")
+              completer?()
+          case .failed:
+              if let error = item.error {
+                  print("Player item failed: \(error.localizedDescription)")
+                  completerError?(error)
+              } else {
+                  print("Player item failed with unknown error.")
+                  completerError?(NSError(domain: "Unknown", code: -1, userInfo: nil))
+              }
+          case .unknown:
+              print("Player item status is unknown.")
+          @unknown default:
+              print("Player item status is unrecognized.")
+          }
       }
-    }
   }
 
   private func setUpSoundCompletedObserver(_ player: AVPlayer, _ playerItem: AVPlayerItem) {
