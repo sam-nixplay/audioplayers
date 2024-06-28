@@ -36,9 +36,12 @@ public class SwiftAudioplayersDarwinPlugin: NSObject, FlutterPlugin {
     self.globalMethods = globalMethodChannel
     self.globalEvents = GlobalAudioPlayersStreamHandler()
 
+    setupAudioSession()
+
     do {
       try globalContext.apply()
     } catch {
+      print("Error applying global audio context: \(error)")
       // ignore error on initialization
     }
 
@@ -46,6 +49,17 @@ public class SwiftAudioplayersDarwinPlugin: NSObject, FlutterPlugin {
 
     self.globalMethods.setMethodCallHandler(self.handleGlobalMethodCall)
     globalEventChannel.setStreamHandler(self.globalEvents)
+  }
+
+  import AVFoundation
+
+  func setupAudioSession() {
+      do {
+          try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+          try AVAudioSession.sharedInstance().setActive(true)
+      } catch {
+          print("Failed to set up audio session: \(error)")
+      }
   }
 
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -85,6 +99,7 @@ public class SwiftAudioplayersDarwinPlugin: NSObject, FlutterPlugin {
 
   private func handleGlobalMethodCall(call: FlutterMethodCall, result: @escaping FlutterResult) {
     let method = call.method
+    print("Handling global method call: \(method)")
 
     guard let args = call.arguments as? [String: Any] else {
       result(
