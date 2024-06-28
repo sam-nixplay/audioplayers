@@ -36,8 +36,6 @@ public class SwiftAudioplayersDarwinPlugin: NSObject, FlutterPlugin {
     self.globalMethods = globalMethodChannel
     self.globalEvents = GlobalAudioPlayersStreamHandler()
 
-    setupAudioSession()
-
     do {
       try globalContext.apply()
     } catch {
@@ -47,11 +45,11 @@ public class SwiftAudioplayersDarwinPlugin: NSObject, FlutterPlugin {
 
     super.init()
 
+    self.setupAudioSession()
+
     self.globalMethods.setMethodCallHandler(self.handleGlobalMethodCall)
     globalEventChannel.setStreamHandler(self.globalEvents)
   }
-
-  import AVFoundation
 
   func setupAudioSession() {
       do {
