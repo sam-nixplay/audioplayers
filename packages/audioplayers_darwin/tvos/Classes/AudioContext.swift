@@ -1,5 +1,6 @@
 import AVFoundation
 import MediaPlayer
+import AVFAudio
 
 struct AudioContext {
     let category: AVAudioSession.Category

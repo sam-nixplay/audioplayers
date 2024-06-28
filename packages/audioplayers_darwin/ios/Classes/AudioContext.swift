@@ -1,3 +1,7 @@
+import AVFoundation
+import MediaPlayer
+import AVFAudio
+
 struct AudioContext {
     let category: AVAudioSession.Category
     let options: AVAudioSession.CategoryOptions
@@ -33,8 +37,6 @@ struct AudioContext {
         print("Applying audio session category: \(category) with options: \(options)")
         try session.setCategory(category, options: options)
         print("Audio session category applied: \(category)")
-        try session.setActive(true)
-        print("Audio session forcibly activated.")
     }
 
     static func parse(args: [String: Any]) throws -> AudioContext? {
