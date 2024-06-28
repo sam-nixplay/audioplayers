@@ -82,7 +82,6 @@ class WrappedMediaPlayer {
       }
   }
 
-
   private func activateAudioSession() {
     let session = AVAudioSession.sharedInstance()
     do {
@@ -180,42 +179,38 @@ class WrappedMediaPlayer {
     return player.currentItem?.currentTime()
   }
 
-  private func createPlayerItem(
-    url: String,
-    isLocal: Bool,
-    mimeType: String? = nil
-  ) throws -> AVPlayerItem {
-    guard
-      let parsedUrl = isLocal
-        ? URL(fileURLWithPath: url.deletingPrefix("file://")) : URL(string: url)
-    else {
-      throw AudioPlayerError.error("Url not valid: \(url)")
-    }
-
-    let playerItem: AVPlayerItem
-
-    if let unwrappedMimeType = mimeType {
-      if #available(iOS 17, tvOS 17, macOS 14.0, *) {
-        let asset = AVURLAsset(
-          url: parsedUrl, options: [AVURLAssetOverrideMIMETypeKey: unwrappedMimeType])
-        playerItem = AVPlayerItem(asset: asset)
+  private func createPlayerItem(url: String, isLocal: Bool, mimeType: String?) throws -> AVPlayerItem {
+      let asset: AVAsset
+      if isLocal {
+          let fileURL = URL(fileURLWithPath: url)
+          asset = AVAsset(url: fileURL)
       } else {
-        let asset = AVURLAsset(
-          url: parsedUrl, options: ["AVURLAssetOutOfBandMIMETypeKey": unwrappedMimeType])
-        playerItem = AVPlayerItem(asset: asset)
+          guard let fileURL = URL(string: url) else {
+              throw NSError(domain: "Invalid URL", code: -1, userInfo: nil)
+          }
+          asset = AVAsset(url: fileURL)
       }
-    } else {
-      playerItem = AVPlayerItem(url: parsedUrl)
-    }
 
-    playerItem.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithm.timeDomain
-    return playerItem
+      let playerItem = AVPlayerItem(asset: asset)
+      asset.loadValuesAsynchronously(forKeys: ["playable"]) {
+          var error: NSError? = nil
+          let status = asset.statusOfValue(forKey: "playable", error: &error)
+          switch status {
+          case .loaded:
+              print("Asset loaded and playable.")
+          case .failed:
+              print("Asset failed to load: \(error?.localizedDescription ?? "Unknown error")")
+          default:
+              print("Asset loading status: \(status.rawValue)")
+          }
+      }
+      return playerItem
   }
 
   private func setUpPlayerItemStatusObservation(
-    _ playerItem: AVPlayerItem,
-    completer: Completer?,
-    completerError: CompleterError?
+      _ playerItem: AVPlayerItem,
+      completer: Completer?,
+      completerError: CompleterError?
   ) {
       playerItem.observe(\.status, options: [.new, .initial]) { item, change in
           switch item.status {
