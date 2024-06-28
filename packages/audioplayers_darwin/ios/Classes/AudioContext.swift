@@ -1,6 +1,3 @@
-import AVFoundation
-import MediaPlayer
-
 struct AudioContext {
     let category: AVAudioSession.Category
     let options: AVAudioSession.CategoryOptions
@@ -22,9 +19,13 @@ struct AudioContext {
         active: Bool
     ) throws {
         let session = AVAudioSession.sharedInstance()
-        print("Activating audio session: \(active)")
-        try session.setActive(active)
-        print("Audio session activated: \(active)")
+        do {
+            try session.setCategory(.playback, mode: .default, options: [])
+            try session.setActive(true)
+            print("Audio session activated successfully.")
+        } catch {
+            print("Failed to activate audio session: \(error.localizedDescription)")
+        }
     }
 
     func apply() throws {
@@ -32,6 +33,8 @@ struct AudioContext {
         print("Applying audio session category: \(category) with options: \(options)")
         try session.setCategory(category, options: options)
         print("Audio session category applied: \(category)")
+        try session.setActive(true)
+        print("Audio session forcibly activated.")
     }
 
     static func parse(args: [String: Any]) throws -> AudioContext? {

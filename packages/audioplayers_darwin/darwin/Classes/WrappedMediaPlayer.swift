@@ -52,6 +52,8 @@ class WrappedMediaPlayer {
   ) {
     let playbackStatus = player.currentItem?.status
 
+    activateAudioSession()  // Ensure audio session is activated
+
     if self.url != url || playbackStatus == .failed || playbackStatus == nil {
       reset()
       self.url = url
@@ -72,6 +74,17 @@ class WrappedMediaPlayer {
       if playbackStatus == .readyToPlay {
         completer?()
       }
+    }
+  }
+
+  private func activateAudioSession() {
+    let session = AVAudioSession.sharedInstance()
+    do {
+        try session.setCategory(.playback, mode: .default, options: [])
+        try session.setActive(true)
+        print("Audio session activated successfully.")
+    } catch {
+        print("Failed to activate audio session: \(error.localizedDescription)")
     }
   }
 

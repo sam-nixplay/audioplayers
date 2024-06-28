@@ -22,9 +22,13 @@ struct AudioContext {
         active: Bool
     ) throws {
         let session = AVAudioSession.sharedInstance()
-        print("Activating audio session: \(active)")
-        try session.setActive(active)
-        print("Audio session activated: \(active)")
+        do {
+            try session.setCategory(.playback, mode: .default, options: [])
+            try session.setActive(true)
+            print("Audio session activated successfully.")
+        } catch {
+            print("Failed to activate audio session: \(error.localizedDescription)")
+        }
     }
 
     func apply() throws {
